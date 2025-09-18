@@ -1,0 +1,26 @@
+<div class="container mt-4">
+    <h3>📋 Saved Form Templates</h3>
+    
+    <button  class="btn btn-primary mb-3" (click)="newForm()">
+      + New Form
+    </button>
+  
+    <div *ngIf="templates.length === 0" class="alert alert-info">
+      No form templates created yet. Click <b>+ New Form</b> to get started.
+    </div>
+  
+    <ul class="list-group" *ngIf="templates.length > 0">
+      <li *ngFor="let t of templates" class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ t.formName }}</strong>
+          <!-- <span class="text-muted ms-2">({{ t.fields?.length || 0 }} fields)</span> -->
+        </div>
+        <div>
+          <!-- <button class="btn btn-sm btn-info me-2" (click)="preview(t.id)">Preview</button> -->
+          <!-- <button class="btn btn-sm btn-warning me-2" (click)="edit(t.id)">Edit</button> -->
+          <button  class="btn btn-sm btn-danger" (click)="deleteForm(t.id)">Delete</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+  

@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { Router } from '@angular/router';
+import { FormService } from '../form.service';
 
 
 @Component({
@@ -22,9 +24,11 @@ export class AdminDashboardComponent implements OnInit {
   isEditMode = false;
   editId!: string;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder,private router: Router , private service: FormService) {}
 
   ngOnInit(): void {
+
+    
     this.initializeForm();
   }
 
@@ -134,12 +138,24 @@ export class AdminDashboardComponent implements OnInit {
       });
 
       const finalFormData = {
+        id: this.generateObjectId(),
         formName: formData.formName,
         fields: cleanedFields
       };
 
       console.log(' Form data:', finalFormData);
+      
+ 
+      if (this.isEditMode) {
+        this.service.update(this.editId, finalFormData);
+      } else {
+        this.service.add(finalFormData);
+      }
+
+
+
       localStorage.setItem('savedForms', JSON.stringify(finalFormData));
+      this.router.navigate(['/form-list']);
 
       
     } 
