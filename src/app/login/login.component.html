@@ -1,0 +1,19 @@
+<!-- login.component.html -->
+<div class="login-container">
+    <mat-card>
+      <h2>Login</h2>
+  
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Select Role</mat-label>
+        <mat-select [(value)]="selectedRole">
+          <mat-option value="Admin">Admin</mat-option>
+          <mat-option value="User">User</mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <button mat-raised-button color="primary" (click)="login()" [disabled]="!selectedRole">
+        Login
+      </button>
+    </mat-card>
+  </div>
+  

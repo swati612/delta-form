@@ -1,0 +1,194 @@
+<div class="container">
+  <form [formGroup]="formBuilderForm" (ngSubmit)="save()">
+    <div class="main-content">
+      <div class="header-section">
+        <h1 class="page-title">Form Builder</h1>
+        <div class="form-name-section">
+          <div class="input-group">
+            <label for="formName">Form Name</label>     
+              <span class="red">* required</span>
+            <input 
+              type="text" 
+              id="formName"
+              formControlName="formName" 
+              placeholder="Enter form name"
+              class="form-input"
+              [class.error]="formBuilderForm.get('formName')?.hasError('required') && formBuilderForm.get('formName')?.touched">
+            <span class="error-message" *ngIf="formBuilderForm.get('formName')?.hasError('required') && formBuilderForm.get('formName')?.touched">
+              Form name is required
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="builder-layout">
+        <div class="field-palette">
+          <h3 class="section-title">Field Types</h3>
+          <div cdkDropList 
+               [cdkDropListData]="fieldTypes" 
+               cdkDropListSortingDisabled
+               [cdkDropListConnectedTo]="['formFieldsList']"
+               class="field-types-list">
+            <div *ngFor="let type of fieldTypes" 
+                 cdkDrag 
+                 class="field-type-item">
+              <div class="field-type-card">
+                <div class="field-type-icon">
+                  <i class="icon-{{ type }}"></i>
+                </div>
+                <span class="field-type-label">{{ type | titlecase }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-canvas-wrapper">
+          <h3 class="section-title">Form Builder</h3>
+          <p class="canvas-subtitle">Drag field types here to build your form</p>
+          
+          <div cdkDropList 
+               id="formFieldsList" 
+               [cdkDropListData]="fieldsArray.controls" 
+               [cdkDropListConnectedTo]="['fieldTypes']"
+               (cdkDropListDropped)="drop($event)" 
+               class="form-canvas">
+            
+            <div *ngFor="let field of fieldsArray.controls; let i = index" 
+                 class="field-item">
+              <div class="field-card">
+                <div class="field-card-header">
+                  <div class="field-type-badge">
+                    {{ getFieldFormGroup(i).get('type')?.value | uppercase }}
+                  </div>
+                  <div class="field-actions">
+                   
+                    <button 
+                      type="button"
+                      class="action-btn delete-button" 
+                      (click)="removeField(i)"
+                      title="Delete field">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                <div [formGroup]="getFieldFormGroup(i)" class="field-form">
+                  <div class="input-group">
+                    <label>Field Label</label>
+                    <input 
+                      type="text" 
+                      formControlName="label"
+                      placeholder="Enter field label"
+                      class="form-input"
+                      [class.error]="getFieldFormGroup(i).get('label')?.hasError('required') && getFieldFormGroup(i).get('label')?.touched">
+                    <span class="error-message" *ngIf="getFieldFormGroup(i).get('label')?.hasError('required') && getFieldFormGroup(i).get('label')?.touched">
+                      Label is required
+                    </span>
+                  </div>
+
+                  <div class="input-group">
+                    <label>Help Text</label>
+                    <input 
+                      type="text" 
+                      formControlName="helpText"
+                      placeholder="Optional help text"
+                      class="form-input">
+                  </div>
+
+                  <div class="checkbox-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" formControlName="required" class="checkbox-input">
+                      <!-- <span class="checkbox-custom"></span> -->
+                      Required Field
+                    </label>
+                  </div>
+
+                  <div *ngIf="hasOptions(getFieldFormGroup(i).get('type')?.value)" 
+                       class="options-section">
+                    <h4 class="options-title">Options</h4>
+                    <div formArrayName="options" class="options-list">
+                      <div *ngFor="let option of getOptionsArray(i).controls; let j = index" 
+                           class="option-item">
+                        <input 
+                          type="text" 
+                          [formControlName]="j"
+                          placeholder="Option {{ j + 1 }}"
+                          class="form-input option-input">
+                        <button 
+                          type="button"
+                          class="remove-option-btn" 
+                          (click)="removeOption(i, j)"
+                          [disabled]="getOptionsArray(i).length <= 1"
+                          title="Remove option">
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                    <button 
+                      type="button"
+                      class="add-option-btn" 
+                      (click)="addOption(i)">
+                      + Add Option
+                    </button>
+                  </div>
+
+                  <div *ngIf="hasTextValidation(getFieldFormGroup(i).get('type')?.value)" 
+                       class="validation-section">
+                    <h4 class="validation-title">Validation Rules</h4>
+                    <div class="validation-row">
+                      <div class="input-group">
+                        <label>Min Length</label>
+                        <input 
+                          type="number" 
+                          formControlName="minLength"
+                          placeholder="0"
+                          class="form-input number-input">
+                      </div>
+                      <div class="input-group">
+                        <label>Max Length</label>
+                        <input 
+                          type="number" 
+                          formControlName="maxLength"
+                          placeholder="100"
+                          class="form-input number-input">
+                      </div>
+                    </div>
+                    <div class="input-group">
+                      <label>Pattern (RegEx)</label>
+                      <input 
+                        type="text" 
+                        formControlName="pattern"
+                        placeholder="Regular expression pattern"
+                        class="form-input">
+                      <span class="input-hint">Regular expression pattern for validation</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+           
+          </div>
+        </div>
+      </div>
+
+      <div class="action-section">
+        <div class="action-group primary-actions">
+          <button 
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="formBuilderForm.invalid">
+             Save Form
+          </button>
+          <button 
+          type="button"
+          class="btn btn-danger"
+          (click)="resetForm()">
+          Reset
+        </button>
+        </div>
+        
+       
+      </div>
+    </div>
+  </form>
+</div>
